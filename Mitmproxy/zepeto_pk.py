@@ -9,9 +9,10 @@ import requests
 from debug_info import Log_info
 import threading
 
-TARGETID="YBE29I"
-HEADURL="https://cdn.zepeto.cn/users/619375e7cc34fc6ca1f182e2/profile/619375ea89dbbe189a31435e.png"
+TARGETID="VGD1ZV"
+HEADURL="https://cdn.zepeto.cn/users/6170e59889dbbe36ea764bd0/profile/6170e59c62b1103df9e2926f.png"
 HEADER_LIST = {}
+USER = {}
 
 class Modify:
     global logger
@@ -25,52 +26,82 @@ class Modify:
 
     def request(self, flow):
         # print("已进入request")
-    
-        if "UsersInfoRequest" or "CounterRequest" in flow.request.url:
+
+        # IOS
+        if "UsersInfoRequest" in flow.request.url:
             print("userinfo~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
             for k, v in flow.request.headers.items():
-                print("%-30s: %s" % (k.upper(), v))
+                # print("%-30s: %s" % (k.upper(), v))
                 HEADER_LIST[k.upper()] = v
             # print(HEADER_LIST)
+
+        if "CounterRequest" in flow.request.url:
+            print("CounterRequest ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+            for k, v in flow.request.headers.items():
+                # print("%-30s: %s" % (k.upper(), v))
+                HEADER_LIST[k.upper()] = v
+
+        if "gapi.zepeto.cn/user/post" in flow.request.url:
+            print("gapi.zepeto.cn/user/post ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+            resp_json = json.loads(flow.request.get_text())
+                # print("%-30s: %s" % (k.upper(), v))
+            HEADER_LIST['userId'] = resp_json['userId']
          
 
-
-        if flow.request.url.startswith("https://api-zepeto.kajicam.com/zepeto/activity/fashion/pk"):
+        if "helpTicket" in flow.request.url:
+            for i in range(10):
+                print("-------------")
+            print(flow.request.url)
+            for i in range(10):
+                print("-------------")
+            print(HEADER_LIST)
             modified = int(round(time.time() * 1000))
+            au = HEADER_LIST['AUTHORIZATION']
             while 1:
-                try:
+                # try:
                     # targetId为目标用户
                     data = {
-                        "authToken":HEADER_LIST['AUTHORIZATION'],
+                        "authToken":au,
                         "duid":HEADER_LIST['X-ZEPETO-DUID'],
                         "zzId":HEADER_LIST['hashCode'],
                         "targetId":TARGETID,
                         "userId":HEADER_LIST['userId'],
-                        "nickName":HEADER_LIST['name'],
+                        "nickName":HEADER_LIST['hashCode'],
                         "headUrl":HEADURL,
-                        "modified": modified
+                        "modified":str(modified)
                     }
-                    resp = requests.post("https://api-zepeto.kajicam.com/zepeto/activity/fashion/pk/api/pkCoin/helpTicket",data=data)
+                    print(data)
+                    res = requests.post("https://api-zepeto.kajicam.com/zepeto/activity/fashion/pk/api/pkCoin/helpTicket",data=data)
+                    resp = json.loads(res.text)
                     print(resp)
-                    if resp['result']['code'] == "200":
-                        return True
+                    time.sleep(0.1)
+                    if resp['result']['code'] == 200:
+                        print("success")
+                        continue
+                        
                     else:
                         # code返回300为评审券不足
                         break;
 
-                except Exception as e:
-                    logger(e)
-                    break
+                # except Exception as e:
+                #     logger(e)
+                #     break
 
     def response(self, flow):
         if "UsersInfoRequest" in flow.request.url:
             response = json.loads(flow.response.get_text())
-            # print(response)
-            HEADER_LIST['hashCode'] = response['users']['hashCode']
-            HEADER_LIST['userId'] = response['users']['userId']
-            HEADER_LIST['name'] = response['users']['name']
-            # print(HEADER_LIST)
+            print(response)
+            try:
+                HEADER_LIST['hashCode'] = response['users'][0]['hashCode']
+                HEADER_LIST['userId'] = response['users'][0]['userId']
+                HEADER_LIST['name'] = response['users'][0]['name']
+            except Exception as e:
+                print("error")
+            for i in range(10):
+                print("1111111111111111111")
+            print(HEADER_LIST)
             # pass
+
 
 addons = [
     Modify()
