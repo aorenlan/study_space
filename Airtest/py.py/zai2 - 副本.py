@@ -128,4 +128,5 @@ work()
 # text('121.4.168.61')
 # text('8222')
 # generate html report
-# from airtest.report.re
+# from airtest.report.report import simple_report
+# simple_report(__file__, logpath=True)

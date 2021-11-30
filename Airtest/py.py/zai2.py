@@ -76,6 +76,7 @@ def sign_in():
     sleep(5)
     
 def sign_out():
+    sleep(5)
     check_pop()
     sleep(2)
     if exists(Template(r"tpl1637998226479.png", record_pos=(0.407, 0.804), resolution=(1080, 1920))):
@@ -117,9 +118,9 @@ def work():
 def work_s():
     sign_in()
     sign_out()
-work()
+# work()
 # work_s()
-# sign_out()
+sign_out()
 # sign_new()
 # sign_in()
 # sign_out()
