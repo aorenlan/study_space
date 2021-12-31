@@ -48,6 +48,7 @@ def get_auth(phone):
     }
     re = requests.post(
         "https://napi.zepeto.cn/AuthenticationRequest_v2", headers=header, data=json.dumps(data)).text
+    time.sleep(2)
     re_json = json.loads(re)
     auth_token = re_json['authToken']
     user_id = re_json['userId']
@@ -71,6 +72,7 @@ def get_user_info():
     data = {"userIds": [user_id]}
     re = requests.post(
         "https://napi.zepeto.cn/UsersInfoRequest", headers=header, data=json.dumps(data)).text
+    time.sleep(2)
     re_json = json.loads(re)
     print(re_json)
     user_info = re_json['users'][0]
@@ -83,6 +85,7 @@ def get_ticket():
     global last_count
     re = requests.get(
         "https://api-zepeto.kajicam.com/zepeto/activity/fashion/pk/api/pkCoin/getTickets?zzId="+hash_code+"").text
+    time.sleep(2)
     re_json = json.loads(re)
     last_count = int(re_json['result'])
     print(last_count)
